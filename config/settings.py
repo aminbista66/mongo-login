@@ -88,6 +88,7 @@ MONGO_DB = {
     'connection_uri': os.environ.get('CONNECTION_URI')
 }
 
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
