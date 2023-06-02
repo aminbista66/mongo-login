@@ -8,7 +8,7 @@ def create_user_object(post_object):
     try:
         validate_email(post_object.get('email'))
     except ValidationError:
-        return None
+        raise ValidationError
 
     if post_object.get('password') != post_object.get('confirm-password'):
         raise Exception('Password Does not match')
@@ -19,3 +19,4 @@ def create_user_object(post_object):
         'password': password,
         'confirm_password': password
     }
+    return user_object

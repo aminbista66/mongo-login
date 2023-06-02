@@ -11,7 +11,6 @@ class LoginView(generic.View):
 
 class RegisterView(generic.View):
     def get(self, *args, **kwargs):
-        print(user)
         return render(self.request, 'users/register.html', {})
 
     def post(self, *args, **kwargs):
@@ -24,5 +23,9 @@ class RegisterView(generic.View):
         for i in post_object.keys():
             post_object[i] = self.request.POST.get(str(i))
         user_object = create_user_object(post_object)
-        
+        print(user_object)
+        try:
+            user.insert_one(user_object)
+        except Exception as e:
+            raise e
         return HttpResponseRedirect(reverse_lazy('users:login'))

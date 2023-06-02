@@ -13,7 +13,9 @@ def get_db(db_name):
     return None
 
 def user_collection(name=_default_user_colection):
-    get_db(_db).create_collection(name, user_validator)
+    db = get_db(_db)
+    if name not in db.list_collection_names(): 
+        db.create_collection(name, validator=user_validator)
     return get_db(_db)[name]
 
 user = user_collection()
