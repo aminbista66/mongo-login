@@ -2,11 +2,12 @@ from django.shortcuts import render
 from django.views import generic
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect
-from .helper import create_user_object
+from .helper import create_user_object, UserMixin
 from .mongodb import user
 
 class LoginView(generic.View):
     def get(self, *args, **kwargs):
+        print(self.request.session)
         return render(self.request, 'users/login.html', {})
 
     def post(self, *args, **kwargs):

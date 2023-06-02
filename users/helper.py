@@ -20,3 +20,11 @@ def create_user_object(post_object):
         'confirm_password': password
     }
     return user_object
+
+class UserMixin:
+    def __init__(self):
+        pass
+
+    def is_authenticated(self):
+        print("I am inside is_authenticated()...")
+
