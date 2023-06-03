@@ -63,13 +63,3 @@ class RegisterView(generic.View):
 
 class ProtectedView(generic.TemplateView):
     template_name = "protected/index.html"
-
-
-from django.http import HttpResponse
-def setsession(request):
-    request.session['name'] = 'aminbista'
-    return HttpResponse('Set View')
-
-def getsession(request):
-    request.session['name']
-    return HttpResponse('Get View')
