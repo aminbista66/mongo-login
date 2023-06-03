@@ -1,6 +1,6 @@
 from pymongo.mongo_client import MongoClient
 from django.conf import settings
-from .validators import user_validator
+from .validators import user_validator, session_validator
 
 _connection_uri = settings.MONGO_DB['connection_uri']
 _client = MongoClient(_connection_uri)
@@ -12,10 +12,15 @@ def get_db(db_name):
         return _client[db_name]
     return None
 
-def user_collection_instance(name=_default_user_colection):
+def user_collection(name=_default_user_colection):
     db = get_db(_db)
     if name not in db.list_collection_names(): 
         db.create_collection(name, validator=user_validator)
-    return get_db(_db)[name]
+    return db[name]
 
-user_collection = user_collection_instance()
+def session_collection(name="session"):
+    db = get_db(_db)
+    if name not in db.list_collection_names():
+        db.create_collection(name, validator=session_validator)
+        pass
+    return db[name]

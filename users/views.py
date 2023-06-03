@@ -2,14 +2,28 @@ from django.shortcuts import render
 from django.views import generic
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect
-from .helper import create_user_object, UserMixin, authenticate
+from .helper import create_user_object, authenticate
 from .mongodb import user_collection
+from django.utils import timezone
+import uuid
 
 class LoginView(generic.View):
     def get(self, *args, **kwargs):
         return render(self.request, 'users/login.html', {})
 
     def login(self, user):
+        '''
+            TODO: 
+            - Create session for user (already created we need to populate the session)
+            - store session in mongo db
+            - send session_id to frontend as a cookie
+        '''
+        session_object = {
+            'sid': str(uuid.uuid4().hex),
+            'user_id': user.get('id'),
+            'exp': timezone.now()
+        }
+        print(session_object)
         pass
 
     def post(self, *args, **kwargs):
@@ -17,11 +31,11 @@ class LoginView(generic.View):
             'email': '',
             'password': '',
         }
-
+        
         for i in post_object.keys():
             post_object[i] = self.request.POST.get(str(i))
         user = authenticate(post_object['email'], post_object['password'])
-        
+
         return HttpResponseRedirect(reverse_lazy('users:protected'))
 
 class RegisterView(generic.View):
@@ -42,7 +56,7 @@ class RegisterView(generic.View):
         user_object = create_user_object(post_object)
 
         try:
-            user_collection.insert_one(user_object)
+            user_collection().insert_one(user_object)
         except Exception as e:
             raise e
         return HttpResponseRedirect(reverse_lazy('users:login'))
