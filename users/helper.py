@@ -1,8 +1,7 @@
-from .password import make_password
+from .password import make_password, hasher
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
-
-
+from .mongodb import user_collection
 
 def create_user_object(post_object):
     try:
@@ -21,6 +20,24 @@ def create_user_object(post_object):
     }
     return user_object
 
+def authenticate(email, password):
+    try:
+        user = user_collection.find_one({'email': email})
+        if user is None : return None
+        hasher.verify(user['password'], password)
+        print(user['_id'])
+        user_object = {
+            'id': user['_id'],
+            'email': email,
+            'password': password,
+            'confirm_password': password
+        }
+        return user_object
+    except Exception as e:
+        print(e)
+        return None
+
+# TODO : properly structure this code
 class UserMixin:
     def __init__(self):
         pass
