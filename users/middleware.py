@@ -7,6 +7,8 @@
 
 from django.contrib.auth.backends import BaseBackend
 from .mongodb import session_collection
+from django.contrib.auth.models import AnonymousUser
+from .helper import User
 
 class AuthMiddleWare(BaseBackend):
     def __init__(self, get_response):
@@ -26,9 +28,15 @@ class SessionMiddleWare(BaseBackend):
         self.check_session(request)
         return self.get_response(request)
 
+    def get_session(self, sid):
+        return session_collection().find_one({"sid": sid})
+
     def check_session(self, request):
         sid = request.COOKIES.get('sid') or None
-        print("session: {}".format(session_collection().find_one({"user_id": 'random'})))
         ''''
             check session object for validity....
         '''
+        session = self.get_session(sid)
+        if session is not None:
+            ''' Make User Object for authenticated user functionality '''
+            request.user = User()

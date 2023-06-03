@@ -39,5 +39,9 @@ def authenticate(email, password):
 
 # TODO : properly structure this code
 class User:
-    pass
+    def __init__(self):
+        print("I am authenticated user.")
+    
+    def is_authenticated(self):
+        return True
 
