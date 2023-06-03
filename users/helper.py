@@ -22,7 +22,7 @@ def create_user_object(post_object):
 
 def authenticate(email, password):
     try:
-        user = user_collection.find_one({'email': email})
+        user = user_collection().find_one({'email': email})
         if user is None : return None
         hasher.verify(user['password'], password)
         print(user['_id'])
@@ -38,10 +38,10 @@ def authenticate(email, password):
         return None
 
 # TODO : properly structure this code
-class UserMixin:
+class User:
     def __init__(self):
-        pass
-
+        print("I am authenticated user.")
+    
     def is_authenticated(self):
-        print("I am inside is_authenticated()...")
+        return True
 

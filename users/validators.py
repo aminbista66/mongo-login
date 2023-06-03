@@ -16,3 +16,22 @@ user_validator = {
         }
     }
 }
+
+session_validator = {
+    '$jsonSchema': {
+        'bsonType': 'object',
+        'title': 'User Oject Validation',
+        'required' : ['sid', 'user_id', 'exp'],
+        'properties' : {
+            'sid': {
+                'bsonType': 'string'
+            },
+            'user_id' : {
+                'bsonType' : 'ObjectId'
+            },
+            'exp' : {
+                'bsonType': 'Date'
+            }
+        }
+    }
+}
