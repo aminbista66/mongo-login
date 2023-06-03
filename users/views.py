@@ -14,16 +14,17 @@ class LoginView(generic.View):
 
     def login(self, user):
         '''
-            TODO: 
             - Create session for user (already created we need to populate the session)
             - store session in mongo db
             - send session_id to frontend as a cookie
         '''
+
         session_object = {
             'sid': str(uuid.uuid4().hex),
             'user_id': user.get('id'),
             'exp': timezone.now()
         }
+
         session_col = session_collection()
         session = session_col.find_one({"user_id": session_object.get('user_id')})
         if session is None:
@@ -36,7 +37,7 @@ class LoginView(generic.View):
             'email': '',
             'password': '',
         }
-        
+
         for i in post_object.keys():
             post_object[i] = self.request.POST.get(str(i))
         user = authenticate(post_object['email'], post_object['password'])
@@ -50,7 +51,6 @@ class RegisterView(generic.View):
         return render(self.request, 'users/register.html', {})
 
     def post(self, *args, **kwargs):
-
         post_object = {
             'email': '',
             'password': '',
@@ -69,6 +69,17 @@ class RegisterView(generic.View):
             raise e
         return HttpResponseRedirect(reverse_lazy('users:login'))
 
+class LogoutView(generic.View):
+    def get(self, *args, **kwargs):
+        sid = self.request.COOKIES.get('sid')
+        if sid is not None:
+            session_collection().delete_one({"sid": sid})
+            self.session = {}
+            response = HttpResponseRedirect(reverse_lazy('users:login'))
+            response.delete_cookie('sid')
+            return response
+        return HttpResponseRedirect('users:login')
+    
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 class ProtectedView(LoginRequiredMixin, generic.View):
