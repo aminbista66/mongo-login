@@ -18,13 +18,13 @@ class LoginView(generic.View):
             - store session in mongo db
             - send session_id to frontend as a cookie
         '''
+        minutes_to_expire = 5
 
         session_object = {
             'sid': str(uuid.uuid4().hex),
             'user_id': user.get('id'),
-            'exp': timezone.now()
+            'exp': timezone.now() + timezone.timedelta(minutes=minutes_to_expire)
         }
-
         session_col = session_collection()
         session = session_col.find_one({"user_id": session_object.get('user_id')})
         if session is None:
@@ -79,12 +79,11 @@ class LogoutView(generic.View):
             response.delete_cookie('sid')
             return response
         return HttpResponseRedirect('users:login')
-    
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 class ProtectedView(LoginRequiredMixin, generic.View):
     template_name = "protected/index.html"
 
     def get(self, *args, **kwargs):
-        print(self.request.user.is_authenticated())
         return render(self.request, self.template_name, {})

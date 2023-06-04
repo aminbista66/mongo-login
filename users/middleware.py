@@ -5,6 +5,10 @@
 '''
 
 from django.contrib.auth.backends import BaseBackend
+from django.utils import timezone
+import pytz
+from django.http import HttpResponseRedirect
+from django.urls import reverse_lazy
 from .mongodb import session_collection
 from .helper import User
 
@@ -32,6 +36,9 @@ class SessionMiddleWare(BaseBackend):
     def get_session_id(self, request):
         return request.COOKIES.get('sid')
 
+    def delete_session(self, sid):
+        session_collection().delete_one({'sid': sid})
+
     def fill_session(self, request):
         sid = self.get_session_id(request) or None
         ''''
@@ -51,6 +58,6 @@ class SessionMiddleWare(BaseBackend):
 
         if session is not None:
             exp = session.get('exp')
-            print(exp)
-            from django.utils.timesince import timeuntil
-            print(timeuntil(exp))
+            utc = pytz.UTC
+            if utc.localize(exp) < timezone.now():
+                self.delete_session(sid)
