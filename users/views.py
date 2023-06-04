@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from .helper import create_user_object, authenticate
 from .mongodb import user_collection, session_collection
 from django.utils import timezone
+from django.contrib import messages
 import uuid
 
 class LoginView(generic.View):
@@ -41,10 +42,13 @@ class LoginView(generic.View):
         for i in post_object.keys():
             post_object[i] = self.request.POST.get(str(i))
         user = authenticate(post_object['email'], post_object['password'])
-        sid = self.login(user)
-        response = HttpResponseRedirect(reverse_lazy('users:protected'))
-        response.set_cookie('sid', sid, httponly=True)
-        return response
+        if user is not None:
+            sid = self.login(user)
+            response = HttpResponseRedirect(reverse_lazy('users:protected'))
+            response.set_cookie('sid', sid, httponly=True)
+            return response
+        messages.error(self.request, "email or password didnot match")
+        return HttpResponseRedirect(reverse_lazy('users:login'))
 
 class RegisterView(generic.View):
     def get(self, *args, **kwargs):
@@ -61,6 +65,8 @@ class RegisterView(generic.View):
             post_object[i] = self.request.POST.get(str(i))
 
         # contains hashed password
+        if post_object.get('password') != post_object.get('confirm-password'):
+            raise Exception('Password Does not match')
         user_object = create_user_object(post_object)
 
         try:
