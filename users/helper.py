@@ -25,7 +25,6 @@ def authenticate(email, password):
         user = user_collection().find_one({'email': email})
         if user is None : return None
         hasher.verify(user['password'], password)
-        print(user['_id'])
         user_object = {
             'id': user['_id'],
             'email': email,
@@ -37,10 +36,12 @@ def authenticate(email, password):
         print(e)
         return None
 
+
 # TODO : properly structure this code
 class User:
     def __init__(self):
-        print("I am authenticated user.")
+        # print("I am authenticated user.")
+        pass
     
     def is_authenticated(self):
         return True
